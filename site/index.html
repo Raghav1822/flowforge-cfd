@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#f5f4ef">
+    <meta name="description" content="An open-source, interactive learning lab for computational fluid dynamics.">
+    <title>Flowforge — CFD learning lab</title>
+    <link rel="stylesheet" href="./styles.css">
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="brand" href="#" aria-label="Flowforge home">
+        <span class="brand-mark">f<span>↗</span></span>
+        <span>flowforge<small>OPEN CFD LAB</small></span>
+      </a>
+      <nav class="top-links" aria-label="Main navigation">
+        <a class="active" href="#workspace">Workspace</a>
+        <a href="#learn">Learn</a>
+        <a href="https://github.com/Raghav1822/flowforge-cfd" target="_blank" rel="noreferrer">GitHub ↗</a>
+      </nav>
+      <div class="top-status"><span class="status-dot"></span> BROWSER SOLVER <span class="top-divider"></span> v0.1.0</div>
+    </header>
+
+    <main id="workspace">
+      <section class="intro">
+        <div>
+          <div class="eyebrow"><span class="eyebrow-rule"></span> YOUR FLUID MECHANICS STUDIO</div>
+          <h1>Make flow <em>visible.</em></h1>
+          <p>Build a simple experiment. Watch the equations come alive.</p>
+        </div>
+        <div class="intro-note"><span class="note-icon">✳</span><span>AN INTERACTIVE<br>LEARNING LAB</span></div>
+      </section>
+
+      <section class="workspace-grid">
+        <aside class="panel controls">
+          <div class="panel-heading">
+            <div><span class="step-tag">01 / SET UP</span><h2>Experiment</h2></div>
+            <button class="icon-button" id="reset-button" title="Reset experiment" aria-label="Reset experiment">↺</button>
+          </div>
+
+          <div class="control-section">
+            <div class="section-title"><span>FLOW DOMAIN</span><span class="mono-label">2D · STEADY</span></div>
+            <label class="field-label" for="geometry">Obstacle geometry</label>
+            <div class="select-wrap"><select id="geometry"><option value="cylinder">Circular cylinder</option><option value="square">Square prism</option><option value="none">Empty channel</option></select><span>⌄</span></div>
+            <div class="dimension-row">
+              <label class="field-label">Channel length <span id="length-value">4.0</span><span class="unit">D</span><input id="length" type="range" min="3" max="6" step=".5" value="4"></label>
+              <label class="field-label">Blockage ratio <span id="blockage-value">0.25</span><span class="unit">H</span><input id="blockage" type="range" min=".15" max=".4" step=".05" value=".25"></label>
+            </div>
+            <div class="callout"><span>⌖</span> Drag the obstacle in the viewport to reposition it.</div>
+          </div>
+
+          <div class="control-section">
+            <div class="section-title"><span>FLUID PROPERTIES</span><span class="mono-label">AIR · 20°C</span></div>
+            <label class="field-label" for="velocity">Inlet velocity <strong id="velocity-value">0.06</strong><span class="unit">lu/ts</span></label>
+            <input id="velocity" type="range" min=".02" max=".12" step=".01" value=".06">
+            <label class="field-label" for="viscosity">Kinematic viscosity <strong id="viscosity-value">0.04</strong><span class="unit">lu²/ts</span></label>
+            <input id="viscosity" type="range" min=".02" max=".10" step=".005" value=".04">
+            <label class="field-label" for="diffusivity">Thermal diffusivity <strong id="diffusivity-value">0.015</strong><span class="unit">lu²/ts</span></label>
+            <input id="diffusivity" type="range" min=".005" max=".04" step=".005" value=".015">
+          </div>
+
+          <div class="control-section compact-section">
+            <div class="section-title"><span>VISUALIZE</span><span class="mono-label">FIELD LAYERS</span></div>
+            <div class="field-tabs" role="group" aria-label="Field to visualize">
+              <button class="field-tab active" data-field="velocity">Velocity</button>
+              <button class="field-tab" data-field="pressure">Pressure</button>
+              <button class="field-tab" data-field="temperature">Heat</button>
+            </div>
+            <label class="toggle-row"><span><i class="toggle-icon">≋</i> Streamlines</span><input id="streamlines" type="checkbox" checked><i class="switch"></i></label>
+            <label class="toggle-row"><span><i class="toggle-icon">▦</i> Mesh overlay</span><input id="mesh-overlay" type="checkbox"><i class="switch"></i></label>
+          </div>
+
+          <div class="run-block">
+            <button id="solve-button" class="solve-button"><span class="play-icon">▶</span> Run simulation <span class="button-arrow">↗</span></button>
+            <div class="run-sub"><span id="run-state">READY TO SOLVE</span><span id="solve-time">~ 3 SEC</span></div>
+            <div class="progress-track"><div id="progress-bar"></div></div>
+          </div>
+        </aside>
+
+        <div class="main-column">
+          <section class="panel viewport-panel">
+            <div class="viewport-toolbar">
+              <div><span class="step-tag">02 / OBSERVE</span><span class="viewport-title">Flow field</span></div>
+              <div class="toolbar-right">
+                <span id="field-badge" class="field-badge"><i></i> VELOCITY MAGNITUDE</span>
+                <button id="fullscreen-button" class="icon-button fullscreen" title="Expand visualization" aria-label="Expand visualization">⛶</button>
+              </div>
+            </div>
+            <div class="viewport" id="viewport">
+              <canvas id="flow-canvas" aria-label="Interactive CFD flow visualization"></canvas>
+              <div class="axis-label axis-x">X / STREAMWISE</div><div class="axis-label axis-y">Y / SPANWISE</div>
+              <div class="canvas-legend" id="canvas-legend"><span>LOW</span><div class="legend-gradient"></div><span>HIGH</span></div>
+              <div class="canvas-overlay"><span class="live-dot"></span><span id="canvas-status">SOLVER IDLE</span><span class="overlay-divider"></span><span id="grid-label">96 × 48 CELLS</span></div>
+              <div class="canvas-hint" id="canvas-hint">RUN SIMULATION TO SOLVE FIELD <span>↗</span></div>
+            </div>
+            <div class="viewport-footer"><span><i class="legend-dot inlet-dot"></i>Inlet</span><span><i class="legend-dot wall-dot"></i>Adiabatic wall</span><span><i class="legend-dot obstacle-dot"></i>Obstacle</span><span class="footer-method">D2Q9 LATTICE BOLTZMANN · BGK</span></div>
+          </section>
+
+          <section class="results-strip" aria-label="Simulation results">
+            <article class="result-card">
+              <div class="result-label">REYNOLDS NUMBER <span>Re</span></div><div class="result-value" id="re-result">—</div><div class="result-caption">Inertial / viscous forces</div>
+            </article>
+            <article class="result-card">
+              <div class="result-label">MEAN PRESSURE DROP <span>Δp</span></div><div class="result-value" id="pressure-result">—</div><div class="result-caption">Across the channel <span class="result-unit">lattice units</span></div>
+            </article>
+            <article class="result-card">
+              <div class="result-label">OUTLET TEMPERATURE <span>T̄</span></div><div class="result-value" id="temp-result">—</div><div class="result-caption">Normalized · inlet = 0</div>
+            </article>
+            <article class="result-card">
+              <div class="result-label">GRID RESOLUTION <span>Δx</span></div><div class="result-value" id="grid-result">96 × 48</div><div class="result-caption">Uniform Cartesian mesh</div>
+            </article>
+          </section>
+
+          <section class="panel convergence-panel">
+            <div class="convergence-head"><div><span class="step-tag">03 / VALIDATE</span><h2>Mesh convergence</h2></div><button id="convergence-button" class="secondary-button">Run study <span>↗</span></button></div>
+            <div class="convergence-body">
+              <div class="chart-wrap"><canvas id="convergence-chart" aria-label="Mesh convergence chart"></canvas></div>
+              <div class="convergence-copy"><span class="chart-key"><i></i> PRESSURE COEFFICIENT</span><p>Compare normalized pressure drop across progressively finer grids at matched Reynolds number. A converging result suggests the mesh is capturing the physics.</p><span id="convergence-status" class="convergence-state">NO STUDY RUN YET</span></div>
+            </div>
+          </section>
+        </div>
+      </section>
+
+      <section id="learn" class="learn-strip">
+        <div class="learn-title"><span class="step-tag">FIELD NOTES</span><span>Learn by changing one thing.</span></div>
+        <div class="learn-card"><span class="learn-number">01</span><div><strong>Start with Reynolds</strong><p>Re = U·D / ν. Lower viscosity or increase speed to see stronger inertial effects.</p></div><span class="learn-mark">↗</span></div>
+        <div class="learn-card"><span class="learn-number">02</span><div><strong>Follow the wake</strong><p>Streamlines bend around the obstacle. Watch the wake length change with Re.</p></div><span class="learn-mark">↗</span></div>
+        <div class="learn-card"><span class="learn-number">03</span><div><strong>Check your mesh</strong><p>Run a convergence study. More cells should refine—not reinvent—the result.</p></div><span class="learn-mark">↗</span></div>
+      </section>
+      <footer><span>FLOWFORGE <span class="footer-dot">●</span> OPEN SOURCE, OPEN FLOW</span><span>Built for curious minds <span class="footer-heart">✳</span> Numerical results are educational approximations.</span></footer>
+    </main>
+    <script src="./app.js"></script>
+  </body>
+</html>
